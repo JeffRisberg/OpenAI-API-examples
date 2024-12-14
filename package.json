@@ -1,9 +1,9 @@
 {
-    "name": "MakingWaves01",
+    "name": "OpenAI-API-examples",
     "version": "1.0.0",
-    "main": "example4.js",
+    "main": "example1.js",
     "scripts": {
-        "run": "NODE_NO_WARNINGS=1 node example4.js"
+        "run": "NODE_NO_WARNINGS=1 node example1.js"
     },
     "license": "ISC",
     "dependencies": {
