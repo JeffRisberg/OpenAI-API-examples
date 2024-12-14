@@ -1,0 +1,14 @@
+{
+    "name": "MakingWaves01",
+    "version": "1.0.0",
+    "main": "example4.js",
+    "scripts": {
+        "run": "NODE_NO_WARNINGS=1 node example4.js"
+    },
+    "license": "ISC",
+    "dependencies": {
+        "openai": "^4.73.1",
+        "mysql2": "^3.11.0"
+    },
+    "packageManager": "yarn@4.5.3"
+}
