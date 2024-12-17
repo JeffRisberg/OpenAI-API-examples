@@ -2,9 +2,9 @@
 
 Created during late summer 2024 through December2024
 
-examples1 through examples9 are using the ChatComplention API
+example1 through example9 are using the Chat Completion API
 
-examples11 through examples 19 are using the Assistants API
+example11 through example19 are using the Assistants API
 
 ## Running these
 
