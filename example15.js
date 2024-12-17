@@ -84,7 +84,6 @@ async function main() {
             role: "user", content: prior_info,
         });
 
-
         // Log the first greeting
         var userQuestion = await askQuestion("\nHello there, how can I help you?\n");
 
@@ -110,57 +109,64 @@ async function main() {
                     break;
                 }
                 if (polledRun.status == 'requires_action') {
-                    console.log("requires_action")
-
                     const tool_calls = polledRun.required_action
 
-                    const tool_outputs = []
-
                     if (tool_calls != null) {
-                        for (const tool of polledRun.required_action.submit_tool_outputs.tool_calls) {
-                            console.log(tool)
-                            if (tool.function.name == "get_student_name") {
-                                console.log(tool.function.arguments)
-                                const args = JSON.parse(tool.function.arguments)
-                                console.log(args);
+                        console.log("begin processing actions")
+                        const tool_outputs = []
+
+                        for (const tool_call of polledRun.required_action.submit_tool_outputs.tool_calls) {
+                            console.log(tool_call)
+                            if (tool_call.function.name == "get_student_name") {
+                                //console.log(tool_call.function.arguments)
+                                const args = JSON.parse(tool_call.function.arguments)
+                                //console.log(args);
                                 const id = args.id
-                                console.log(id)
+                                //console.log(id)
+                                const name = get_student_name(id);
+                                //console.log(name)
                                 tool_outputs.push({
-                                    "tool_call_id": tool.id,
-                                    "output": get_student_name(id)
+                                    "tool_call_id": tool_call.id,
+                                    "output": name
                                 })
-                                console.log(tool_outputs);
-                                // hand the answer over
+                                //console.log(tool_outputs);
+
                                 openai.beta.threads.runs.submitToolOutputs(
                                     thread.id,
                                     run.id,
                                     {"tool_outputs": tool_outputs}
                                 )
+                                polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+                                while (polledRun.status == 'queued') {
+                                    await new Promise((resolve) => setTimeout(resolve, 100));
+                                    polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+                                }
                             }
                         }
+                        console.log("end processing actions");
                     }
                 }
-                if (run.required_action != null) {
-                    console.log("not null")
-                }
+                //if (polledRun.required_action != null) {
+                //    console.log("not null")
+                //}
 
-                // wait for 2 seconds then check again
+                // wait for 0.5 seconds then check again
                 await new Promise((resolve) => setTimeout(resolve, 500));
-                runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+                polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
                 console.log("thinking...")
             }
 
             // Get the messages from the thread
             const messages = await openai.beta.threads.messages.list(thread.id);
 
-            // Find the last assistance message for the current run
+            // Find the last assistant message for the current run
             const lastMessageForRun = messages.data
                 .filter((message) => message.run_id === run.id && message.role === "assistant")
                 .pop();
 
             // If an assistant message is found, console.log() it
             if (lastMessageForRun) {
-                console.log(`${lastMessageForRun.content[0].text.value} \n`);
+                console.log(`${lastMessageForRun.content[0].text.value}`);
             }
 
             // Ask for the next question

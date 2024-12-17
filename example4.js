@@ -64,7 +64,9 @@ async function main() {
                                     "id": {
                                         "type": "integer", "description": "Id of student"
                                     }
-                                }, "required": ["id"]
+                                },
+                                "required": ["id"],
+                                "additionalProperties": false
                             }
                         }
                     }],
@@ -72,35 +74,23 @@ async function main() {
 
             const message = response.choices[0].message
             const tool_calls = message.tool_calls;
-            console.log(tool_calls);
 
             if (tool_calls == null || tool_calls.length == 0) {
                 console.log(response.choices[0].message);
                 break;
             } else {
-                console.log("must make tool calls")
+                //console.log("start tool calls")
+                messages.push(message)
 
-                for (const tool of tool_calls) {
-                    console.log(tool)
-                    if (tool.function.name == "get_student_name") {
-                        const args = JSON.parse(tool.function.arguments)
-                        console.log(args);
+                for (const tool_call of tool_calls) {
+                    console.log(tool_call)
+                    if (tool_call.function.name == "get_student_name") {
+                        const args = JSON.parse(tool_call.function.arguments)
+                        //console.log(args);
                         const id = args.id;
-                        console.log(id);
+                        //console.log(id);
                         const name = get_student_name(id);
-
-                        // Simulate the tool call response
-                        const response = {
-                            choices: [
-                                {
-                                    message: {
-                                        tool_calls: [
-                                            { id: "tool_call_1" }
-                                        ]
-                                    }
-                                }
-                            ]
-                        };
+                        //console.log(name)
 
                         // Create a message containing the result of the function call
                         const function_call_result_message = {
@@ -108,16 +98,16 @@ async function main() {
                             content: JSON.stringify({
                                 name: name
                             }),
-                            tool_call_id: response.choices[0].message.tool_calls[0].id
+                            tool_call_id: tool_call.id
                         };
                         messages.push(function_call_result_message);
                     }
                 }
-                console.log("completed tool calls")
+                //console.log("completed tool calls")
             }
-            userQuestion = await askQuestion("\nHow else can I help you? ");
-        }
-    }
+        } // inner while
+        userQuestion = await askQuestion("\nHow else can I help you? ");
+    } // outer while
 }
 
 main();
