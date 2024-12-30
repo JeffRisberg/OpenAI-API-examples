@@ -17,10 +17,9 @@ async function askQuestion(question) {
 
 async function main() {
     try {
-        let phone_number = "650-555-1212";
-        try {
-            phone_number = process.argv[2];
-        } catch (error) {
+        let phone_number = process.argv[2];
+        if (phone_number == undefined || phone_number == null) {
+            phone_number = "650-555-1212";
         }
         console.log(phone_number);
 
