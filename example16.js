@@ -17,7 +17,7 @@ async function askQuestion(question) {
 
 async function main() {
     try {
-        var phone_number = "650-555-1212";
+        let phone_number = "650-555-1212";
         try {
             phone_number = process.argv[2];
         } catch (error) {
@@ -25,8 +25,8 @@ async function main() {
         console.log(phone_number);
 
         const assistant_name = "Example16 Assistant";
-        var assistant = null;
-        var thread = null;
+        let assistant = null;
+        let thread;
 
         // Poll the assistants
         const myAssistants = await openai.beta.assistants.list({
@@ -50,14 +50,12 @@ async function main() {
         }
 
         // Get the thread information from the metadata of the assistant
-        var thread_id_map_str = assistant.metadata['thread_id_map']
-        var thread_id_map;
+        let thread_id_map_str = assistant.metadata['thread_id_map']
 
         if (thread_id_map_str == undefined || thread_id_map_str == null) {
             thread_id_map_str = '{}'
         }
-        var thread_id_map = JSON.parse(thread_id_map_str)
-
+        const thread_id_map = JSON.parse(thread_id_map_str)
         const thread_id = thread_id_map[phone_number]
 
         if (thread_id == undefined || thread_id == null) {
@@ -100,7 +98,7 @@ async function main() {
             while (true) {
                 let polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
 
-                if (polledRun.status == 'completed') {
+                if (polledRun.status === 'completed') {
                     break;
                 }
 

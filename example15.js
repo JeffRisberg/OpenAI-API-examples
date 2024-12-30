@@ -94,10 +94,10 @@ async function main() {
             while (true) {
                 let polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
 
-                if (polledRun.status == 'completed') {
+                if (polledRun.status === 'completed') {
                     break;
                 }
-                if (polledRun.status == 'requires_action') {
+                if (polledRun.status === 'requires_action') {
                     const tool_calls = polledRun.required_action
 
                     if (tool_calls != null) {
@@ -106,7 +106,7 @@ async function main() {
 
                         for (const tool_call of polledRun.required_action.submit_tool_outputs.tool_calls) {
                             console.log(tool_call)
-                            if (tool_call.function.name == "get_student_name") {
+                            if (tool_call.function.name === "get_student_name") {
                                 //console.log(tool_call.function.arguments)
                                 const args = JSON.parse(tool_call.function.arguments)
                                 //console.log(args);
@@ -126,7 +126,7 @@ async function main() {
                                     {"tool_outputs": tool_outputs}
                                 )
                                 polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-                                while (polledRun.status == 'queued') {
+                                while (polledRun.status === 'queued') {
                                     await new Promise((resolve) => setTimeout(resolve, 100));
                                     polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
                                 }

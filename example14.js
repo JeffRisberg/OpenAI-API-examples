@@ -70,7 +70,7 @@ async function main() {
             while (true) {
                 let polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
 
-                if (polledRun.status == 'completed') {
+                if (polledRun.status === 'completed') {
                     break;
                 }
 
