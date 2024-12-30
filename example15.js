@@ -136,7 +136,7 @@ async function main() {
                     }
                 }
 
-                // wait for 0.5 seconds then check again
+                // Wait for 0.5 seconds then check again
                 await new Promise((resolve) => setTimeout(resolve, 500));
                 polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
                 console.log("thinking...")

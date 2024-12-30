@@ -1,5 +1,5 @@
-const OpenAI = require("openai");
 const fs = require("fs");
+const OpenAI = require("openai");
 
 const openai = new OpenAI()
 
@@ -102,7 +102,7 @@ async function main() {
                     break;
                 }
 
-                // wait for 0.5 seconds then check again
+                // Wait for 0.5 seconds then check again
                 await new Promise((resolve) => setTimeout(resolve, 500));
                 polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
                 console.log("thinking...")
