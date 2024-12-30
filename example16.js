@@ -1,8 +1,6 @@
 const OpenAI = require("openai");
 const fs = require("fs");
 
-// add tools
-
 const openai = new OpenAI()
 
 const readline = require("readline").createInterface({
@@ -17,40 +15,72 @@ async function askQuestion(question) {
     });
 }
 
-
 async function main() {
     try {
-        const assistant = await openai.beta.assistants.create({
-            name: "College Application Advisor",
-            instructions: "You are a college advisor to high school students.  Only show the top 3 of any list.",
-            tool_resources: {
-                "code_interpreter": {
-                    "file_ids": [salary_file.id, revenue_file.id]
+        var phone_number = "650-555-1212";
+        try {
+            phone_number = process.argv[2];
+        } catch (error) {
+        }
+        console.log(phone_number);
+
+        const assistant_name = "Example16 Assistant";
+        var assistant = null;
+        var thread = null;
+
+        // Poll the assistants
+        const myAssistants = await openai.beta.assistants.list({
+            order: "desc"
+        });
+
+        for (const myAssistant of myAssistants.data) {
+            if (myAssistant.name === assistant_name) {
+                assistant = myAssistant;
+            }
+        }
+
+        if (assistant == undefined || assistant == null) {
+            console.log("Creating assistant")
+            assistant = await openai.beta.assistants.create({
+                name: assistant_name,
+                instructions: "You are a personal math tutor. Write and run code to answer math questions.",
+                tools: [{type: "code_interpreter"}],
+                model: "gpt-4o"
+            });
+        }
+
+        // Get the thread information from the metadata of the assistant
+        var thread_id_map_str = assistant.metadata['thread_id_map']
+        var thread_id_map;
+
+        if (thread_id_map_str == undefined || thread_id_map_str == null) {
+            thread_id_map_str = '{}'
+        }
+        var thread_id_map = JSON.parse(thread_id_map_str)
+
+        const thread_id = thread_id_map[phone_number]
+
+        if (thread_id == undefined || thread_id == null) {
+            console.log("Creating thread")
+            thread = await openai.beta.threads.create();
+
+            // Record the thread id
+            thread_id_map[phone_number] = thread.id;
+
+            // Update the assistant with the new thread_id_map
+            console.log("Recording thread")
+            const myUpdatedAssistant = await openai.beta.assistants.update(
+                assistant.id,
+                {
+                    metadata: {'thread_id_map': JSON.stringify(thread_id_map)}
                 }
-            },
-            tools: [
-                {"type": "code_interpreter"},
-                ],
-            model: "gpt-4o"
-        });
-
-        // Create a thread
-        const thread = await openai.beta.threads.create();
-
-        prior_info = "You can find internships by going to https://simplify.jobs/l/Internships-in-SF-Bay-Area"
-        await openai.beta.threads.messages.create(thread.id, {
-            role: "user", content: prior_info,
-        });
-
-        prior_info = "There are ecologist internships available at Gilead.  See Intern – Clinical Project Assistant\n" +
-            "Clinical Operations, Oncology. The link is https://simplify.jobs/p/d9abe85e-c461-47de-962a-2b29ac1b2e08/Intern--Clinical-Project-Assistant"
-        await openai.beta.threads.messages.create(thread.id, {
-            role: "user", content: prior_info,
-        });
-
+            )
+        } else {
+            thread = await openai.beta.threads.retrieve(thread_id);
+        }
 
         // Post the first greeting
-        var userQuestion = await askQuestion("\nHello there, how can I help you?\n");
+        var userQuestion = await askQuestion("\nHello there, I am a financial wizard. How can I help you?\n");
 
         // Use keepAsking as state for keep asking questions
         let keepAsking = true;

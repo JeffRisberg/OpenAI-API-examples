@@ -1,8 +1,6 @@
 const OpenAI = require("openai");
 const fs = require("fs");
 
-// add tools
-
 const openai = new OpenAI()
 
 const readline = require("readline").createInterface({
@@ -17,24 +15,6 @@ async function askQuestion(question) {
     });
 }
 
-
-function get_student_name(id) {
-    // Replace with your actual endpoint
-    // url = "http://your_api_endpoint/order_info"
-    params = {'id': id}
-    // response = requests.post(url, params=params)
-
-    // if response.status_code == 200:
-    //  return response.json()['Result'][0]
-    // else:
-    //  return f"Error: Unable to fetch order details. Status code: {response.status_code}"
-    if (id == 14) {
-        return "Alex DeLarge";
-    } else {
-        return "Frodo Baggins";
-    }
-}
-
 async function main() {
     try {
         const salary_file = await openai.files.create({
@@ -47,8 +27,8 @@ async function main() {
         });
 
         const assistant = await openai.beta.assistants.create({
-            name: "College Application Advisor",
-            instructions: "You are a college advisor to high school students.  Only show the top 3 of any list.",
+            name: "Financial Advisor",
+            instructions: "You are a financial wizard.  You can review csv files and generate trends.",
             tool_resources: {
                 "code_interpreter": {
                     "file_ids": [salary_file.id, revenue_file.id]
@@ -56,37 +36,15 @@ async function main() {
             },
             tools: [
                 {"type": "code_interpreter"},
-                {
-                    "type": "function", "function": {
-                        "name": "get_student_name", "description": "Get name of a student given an id", "parameters": {
-                            "type": "object", "properties": {
-                                "id": {
-                                    "type": "integer", "description": "Id of student"
-                                }
-                            }, "required": ["id"]
-                        }
-                    }
-                }],
+                ],
             model: "gpt-4o"
         });
 
-        // Create a thread (later code should create a thread for each student)
+        // Create a thread
         const thread = await openai.beta.threads.create();
 
-        prior_info = "You can find internships by going to https://simplify.jobs/l/Internships-in-SF-Bay-Area"
-        await openai.beta.threads.messages.create(thread.id, {
-            role: "user", content: prior_info,
-        });
-
-        prior_info = "There are ecologist internships available at Gilead.  See Intern – Clinical Project Assistant\n" +
-            "Clinical Operations, Oncology. The link is https://simplify.jobs/p/d9abe85e-c461-47de-962a-2b29ac1b2e08/Intern--Clinical-Project-Assistant"
-        await openai.beta.threads.messages.create(thread.id, {
-            role: "user", content: prior_info,
-        });
-
-
-        // Log the first greeting
-        var userQuestion = await askQuestion("\nHello there, how can I help you?\n");
+        // Post the first greeting
+        var userQuestion = await askQuestion("\nHello there, I am a financial wizard. How can I help you?\n");
 
         // Use keepAsking as state for keep asking questions
         let keepAsking = true;
@@ -109,44 +67,10 @@ async function main() {
                 if (polledRun.status == 'completed') {
                     break;
                 }
-                if (polledRun.status == 'requires_action') {
-                    console.log("requires_action")
 
-                    const tool_calls = polledRun.required_action
-
-                    const tool_outputs = []
-
-                    if (tool_calls != null) {
-                        for (const tool of polledRun.required_action.submit_tool_outputs.tool_calls) {
-                            console.log(tool)
-                            if (tool.function.name == "get_student_name") {
-                                console.log(tool.function.arguments)
-                                const args = JSON.parse(tool.function.arguments)
-                                console.log(args);
-                                const id = args.id
-                                console.log(id)
-                                tool_outputs.push({
-                                    "tool_call_id": tool.id,
-                                    "output": get_student_name(id)
-                                })
-                                console.log(tool_outputs);
-                                // hand the answer over
-                                openai.beta.threads.runs.submitToolOutputs(
-                                    thread.id,
-                                    run.id,
-                                    {"tool_outputs": tool_outputs}
-                                )
-                            }
-                        }
-                    }
-                }
-                if (run.required_action != null) {
-                    console.log("not null")
-                }
-
-                // wait for 2 seconds then check again
+                // wait for 0.5 seconds then check again
                 await new Promise((resolve) => setTimeout(resolve, 500));
-                runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+                polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
                 console.log("thinking...")
             }
 

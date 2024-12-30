@@ -1,8 +1,6 @@
 const OpenAI = require("openai");
 const fs = require("fs");
 
-// add tools
-
 const openai = new OpenAI()
 
 const readline = require("readline").createInterface({
@@ -37,15 +35,6 @@ function get_student_name(id) {
 
 async function main() {
     try {
-        const salary_file = await openai.files.create({
-            file: fs.createReadStream("salary-data.csv"),
-            purpose: "assistants",
-        });
-        const revenue_file = await openai.files.create({
-            file: fs.createReadStream("revenue-forecast.csv"),
-            purpose: "assistants",
-        });
-
         const assistant = await openai.beta.assistants.create({
             name: "College Application Advisor",
             instructions: "You are a college advisor to high school students.  Only show the top 3 of any list.",
@@ -70,7 +59,7 @@ async function main() {
             model: "gpt-4o"
         });
 
-        // Create a thread (later code should create a thread for each student)
+        // Create a thread
         const thread = await openai.beta.threads.create();
 
         prior_info = "You can find internships by going to https://simplify.jobs/l/Internships-in-SF-Bay-Area"
@@ -84,7 +73,7 @@ async function main() {
             role: "user", content: prior_info,
         });
 
-        // Log the first greeting
+        // Post the first greeting
         var userQuestion = await askQuestion("\nHello there, how can I help you?\n");
 
         // Use keepAsking as state for keep asking questions
@@ -146,9 +135,6 @@ async function main() {
                         console.log("end processing actions");
                     }
                 }
-                //if (polledRun.required_action != null) {
-                //    console.log("not null")
-                //}
 
                 // wait for 0.5 seconds then check again
                 await new Promise((resolve) => setTimeout(resolve, 500));
