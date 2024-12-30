@@ -23,11 +23,6 @@ async function main() {
         const assistant = await openai.beta.assistants.create({
             name: "College Application Advisor",
             instructions: "You are a college advisor to high school students.  Only show the top 3 of any list.",
-            tool_resources: {
-                "code_interpreter": {
-                    "file_ids": [salary_file.id, revenue_file.id]
-                }
-            },
             tools: [
                 {"type": "code_interpreter"},
                 ],
@@ -68,7 +63,7 @@ async function main() {
             // Polling mechanism to see if runStatus is completed
             // This should be made more robust.
             while (true) {
-                let polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+                const polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
 
                 if (polledRun.status === 'completed') {
                     break;
@@ -76,7 +71,6 @@ async function main() {
 
                 // Wait for 0.5 seconds then check again
                 await new Promise((resolve) => setTimeout(resolve, 500));
-                polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
                 console.log("thinking...")
             }
 

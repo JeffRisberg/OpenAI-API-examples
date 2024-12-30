@@ -3,10 +3,6 @@ const fs = require("fs");
 
 const openai = new OpenAI()
 
-const readline = require("readline").createInterface({
-    input: process.stdin, output: process.stdout,
-});
-
 async function askQuestion(question) {
     return new Promise((resolve, reject) => {
         readline.question(question, (answer) => {
@@ -36,64 +32,53 @@ async function main() {
             },
             tools: [
                 {"type": "code_interpreter"},
-                ],
+            ],
             model: "gpt-4o"
         });
 
         // Create a thread
         const thread = await openai.beta.threads.create();
 
-        // Post the first greeting
-        var userQuestion = await askQuestion("\nHello there, I am a financial wizard. How can I help you?\n");
+        const message = await openai.beta.threads.messages.create(
+            thread.id,
+            {
+                "role": "user",
+                "content": "Create 3 data visualizations based on the trends in this file."
+            }
+        );
 
-        // Use keepAsking as state for keep asking questions
-        let keepAsking = true;
-        while (keepAsking) {
-            // Pass in the user question into the thread
-            await openai.beta.threads.messages.create(thread.id, {
-                role: "user", content: userQuestion,
-            });
+        const run = await openai.beta.threads.runs.create(
+            thread.id,
+            {assistant_id: assistant.id}
+        );
 
-            // Use runs to wait for the assistant response and then retrieve it
-            const run = await openai.beta.threads.runs.create(thread.id, {
-                assistant_id: assistant.id,
-            });
+        // Polling mechanism to see if runStatus is completed
+        // This should be made more robust.
+        while (true) {
+            const polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
 
-            // Polling mechanism to see if runStatus is completed
-            // This should be made more robust.
-            while (true) {
-                let polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-
-                if (polledRun.status === 'completed') {
-                    break;
-                }
-
-                // Wait for 0.5 seconds then check again
-                await new Promise((resolve) => setTimeout(resolve, 500));
-                polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-                console.log("thinking...")
+            if (polledRun.status === 'completed') {
+                break;
             }
 
-            // Get the messages from the thread
-            const messages = await openai.beta.threads.messages.list(thread.id);
-
-            // Find the last assistance message for the current run
-            const lastMessageForRun = messages.data
-                .filter((message) => message.run_id === run.id && message.role === "assistant")
-                .pop();
-
-            // If an assistant message is found, console.log() it
-            if (lastMessageForRun) {
-                console.log(`${lastMessageForRun.content[0].text.value} \n`);
-            }
-
-            // Ask for the next question
-            userQuestion = await askQuestion("\nHow else can I help you? ");
+            // Wait for 0.5 seconds then check again
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            console.log("thinking...")
         }
 
-        // close the readline
-        readline.close();
-    } catch (error) {
+        const messages = await openai.beta.threads.messages.list(run.thread_id);
+        for (const message of messages.data.reverse()) {
+            const content0 = message.content[0];
+
+            if (content0.text != undefined) {
+                console.log(`${message.role} > ${message.content[0].text.value}`);
+            }
+            if (content0.image_file != undefined) {
+                console.log(`${message.role} > ${message.content[0].image_file}`);
+            }
+        }
+    } catch
+        (error) {
         console.error(error);
     }
 }

@@ -96,7 +96,7 @@ async function main() {
             // Polling mechanism to see if runStatus is completed
             // This should be made more robust.
             while (true) {
-                let polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+                const polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
 
                 if (polledRun.status === 'completed') {
                     break;
@@ -104,7 +104,6 @@ async function main() {
 
                 // Wait for 0.5 seconds then check again
                 await new Promise((resolve) => setTimeout(resolve, 500));
-                polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
                 console.log("thinking...")
             }
 
