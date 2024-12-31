@@ -1,5 +1,5 @@
-const OpenAI = require("openai");
 const fs = require("fs");
+const OpenAI = require("openai");
 
 const openai = new OpenAI()
 
@@ -13,10 +13,6 @@ async function askQuestion(question) {
 
 async function main() {
     try {
-        const salary_file = await openai.files.create({
-            file: fs.createReadStream("salary-data.csv"),
-            purpose: "assistants",
-        });
         const revenue_file = await openai.files.create({
             file: fs.createReadStream("revenue-forecast.csv"),
             purpose: "assistants",
@@ -27,7 +23,7 @@ async function main() {
             instructions: "You are a financial wizard.  You can review csv files and generate trends.",
             tool_resources: {
                 "code_interpreter": {
-                    "file_ids": [salary_file.id, revenue_file.id]
+                    "file_ids": [revenue_file.id]
                 }
             },
             tools: [
@@ -43,7 +39,7 @@ async function main() {
             thread.id,
             {
                 "role": "user",
-                "content": "Create 3 data visualizations based on the trends in this file."
+                "content": "Create a chart of revenue by years."
             }
         );
 
@@ -71,10 +67,22 @@ async function main() {
             const content0 = message.content[0];
 
             if (content0.text != undefined) {
-                console.log(`${message.role} > ${message.content[0].text.value}`);
+                console.log(`${message.role} > ${content0.text.value}`);
             }
             if (content0.image_file != undefined) {
-                console.log(`${message.role} > ${message.content[0].image_file}`);
+                const file_id = content0.image_file.file_id;
+                console.log(`${message.role} > ${file_id}`);
+
+                const response = await openai.files.content(file_id);
+
+                // Extract the binary data from the Response object
+                const image_data = await response.arrayBuffer();
+
+                // Convert the binary data to a Buffer
+                const image_data_buffer = Buffer.from(image_data);
+
+                // Save the image to a specific location
+                fs.writeFileSync(`./my-${file_id}-image.png`, image_data_buffer);
             }
         }
     } catch
