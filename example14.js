@@ -43,7 +43,6 @@ async function main() {
             role: "user", content: prior_info,
         });
 
-
         // Post the first greeting
         var userQuestion = await askQuestion("\nHello there, how can I help you?\n");
 
@@ -61,7 +60,6 @@ async function main() {
             });
 
             // Polling mechanism to see if runStatus is completed
-            // This should be made more robust.
             while (true) {
                 const polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
 
@@ -77,7 +75,7 @@ async function main() {
             // Get the messages from the thread
             const messages = await openai.beta.threads.messages.list(thread.id);
 
-            // Find the last assistance message for the current run
+            // Find the last assistant message for the current run
             const lastMessageForRun = messages.data
                 .filter((message) => message.run_id === run.id && message.role === "assistant")
                 .pop();
@@ -91,11 +89,11 @@ async function main() {
             userQuestion = await askQuestion("\nHow else can I help you? ");
         }
 
-        // close the readline
+        // Close input reader
         readline.close();
     } catch (error) {
         console.error(error);
     }
 }
 
-main()
+main();

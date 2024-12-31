@@ -21,7 +21,7 @@ async function main() {
         if (phone_number == undefined || phone_number == null) {
             phone_number = "650-555-1212";
         }
-        console.log(phone_number);
+        console.log(`phone_number ${phone_number}`);
 
         const assistant_name = "Example16 Assistant";
         let assistant = null;
@@ -82,7 +82,7 @@ async function main() {
         // Use keepAsking as state for keep asking questions
         let keepAsking = true;
         while (keepAsking) {
-            // Pass in the user question into the thread
+            // Pass the user question into the thread
             await openai.beta.threads.messages.create(thread.id, {
                 role: "user", content: userQuestion,
             });
@@ -93,7 +93,6 @@ async function main() {
             });
 
             // Polling mechanism to see if runStatus is completed
-            // This should be made more robust.
             while (true) {
                 const polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
 
@@ -130,4 +129,4 @@ async function main() {
     }
 }
 
-main()
+main();

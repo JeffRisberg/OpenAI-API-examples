@@ -18,7 +18,7 @@ async function askQuestion(question) {
 
 function get_student_name(id) {
     // Replace with your actual endpoint
-    // url = "http://your_api_endpoint/order_info"
+    // url = "http://your_api_endpoint/name_info"
     params = {'id': id}
     // response = requests.post(url, params=params)
 
@@ -33,21 +33,44 @@ function get_student_name(id) {
     }
 }
 
+function get_student_major(id) {
+    // Replace with your actual endpoint
+    // url = "http://your_api_endpoint/major_info"
+    params = {'id': id}
+    // response = requests.post(url, params=params)
+
+    // if response.status_code == 200:
+    //  return response.json()['Result'][0]
+    // else:
+    //  return f"Error: Unable to fetch order details. Status code: {response.status_code}"
+    if (id == 14) {
+        return "Being mean";
+    } else {
+        return "Being good";
+    }
+}
+
 async function main() {
     try {
         const assistant = await openai.beta.assistants.create({
             name: "College Application Advisor",
             instructions: "You are a college advisor to high school students.  Only show the top 3 of any list.",
-            tool_resources: {
-                "code_interpreter": {
-                    "file_ids": [salary_file.id, revenue_file.id]
-                }
-            },
             tools: [
                 {"type": "code_interpreter"},
                 {
                     "type": "function", "function": {
                         "name": "get_student_name", "description": "Get name of a student given an id", "parameters": {
+                            "type": "object", "properties": {
+                                "id": {
+                                    "type": "integer", "description": "Id of student"
+                                }
+                            }, "required": ["id"]
+                        }
+                    }
+                },
+                {
+                    "type": "function", "function": {
+                        "name": "get_student_major", "description": "Get major of a student given an id", "parameters": {
                             "type": "object", "properties": {
                                 "id": {
                                     "type": "integer", "description": "Id of student"
@@ -79,7 +102,7 @@ async function main() {
         // Use keepAsking as state for keep asking questions
         let keepAsking = true;
         while (keepAsking) {
-            // Pass in the user question into the thread
+            // Pass the user question into the thread
             await openai.beta.threads.messages.create(thread.id, {
                 role: "user", content: userQuestion,
             });
@@ -90,9 +113,8 @@ async function main() {
             });
 
             // Polling mechanism to see if runStatus is completed
-            // This should be made more robust.
             while (true) {
-                const polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+                let polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
 
                 if (polledRun.status === 'completed') {
                     break;
@@ -118,20 +140,34 @@ async function main() {
                                     "tool_call_id": tool_call.id,
                                     "output": name
                                 })
-                                //console.log(tool_outputs);
-
-                                openai.beta.threads.runs.submitToolOutputs(
-                                    thread.id,
-                                    run.id,
-                                    {"tool_outputs": tool_outputs}
-                                )
-                                polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-                                while (polledRun.status === 'queued') {
-                                    await new Promise((resolve) => setTimeout(resolve, 100));
-                                    polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
-                                }
+                            }
+                            if (tool_call.function.name === "get_student_major") {
+                                //console.log(tool_call.function.arguments)
+                                const args = JSON.parse(tool_call.function.arguments)
+                                //console.log(args);
+                                const id = args.id
+                                //console.log(id)
+                                const major = get_student_major(id);
+                                //console.log(major)
+                                tool_outputs.push({
+                                    "tool_call_id": tool_call.id,
+                                    "output": major
+                                })
                             }
                         }
+
+                        // Make sure that the thread is not 'queued' before submitting tool outputs
+                        polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+                        while (polledRun.status === 'queued') {
+                            await new Promise((resolve) => setTimeout(resolve, 100));
+                            polledRun = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+                        }
+
+                        openai.beta.threads.runs.submitToolOutputs(
+                            thread.id,
+                            run.id,
+                            {"tool_outputs": tool_outputs}
+                        )
                         console.log("end processing actions");
                     }
                 }
@@ -158,11 +194,11 @@ async function main() {
             userQuestion = await askQuestion("\nHow else can I help you? ");
         }
 
-        // close the readline
+        // Close input reader
         readline.close();
     } catch (error) {
         console.error(error);
     }
 }
 
-main()
+main();
