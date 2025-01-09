@@ -1,0 +1,77 @@
+Product Requirement Doc <Initiative name> ..Ver 1(DRAFT)
+Ver 1
+* 1 Overview:
+* 2 Use Stories:
+o 2.1 User story 1:
+o 2.2 User Story 2:
+* 3 Scope:
+* 4 Product Requirements:
+o 4.1 <Requirement 1> e.g. Search ranking:
+o 4.2 <Requirement 2> Search Indexing:
+o 4.3 <Requirement 3> Automated Search Jobs:
+* 5 Risks
+* 6 Dependencies
+* 7 Success criteria:
+* 8 Initiative details:
+* 9 Document Versioning & Approvals:
+* 10 Appendix:
+
+Overview:
+Use this section to set the background for the initiative
+Use Stories:
+This is a collection of users stories mentioned below.
+User story 1:
+Describe a user story from the user point of view. Explain the persona, why and how the persona will use this feature.
+User Story 2:
+
+Scope:
+Identify scope of the PRD . e.g.: Scope if this PRD is following sources Share-point, Confluence,. Also identify out of scope details. e.g. This PRD does not apply to documents stored in systems that do not have an API endpoint.
+Product Requirements:
+Pl ensure that the requirements cover functional (behavior) and non functional (latency, retention period, security, languages supported, etc.) requirements.
+<Requirement 1> e.g. Search ranking:
+Describe the requirement . Pl state the purpose, assumptions, inputs, behavior, output and success criteria for that functionality, as applicable. E.g. This functionality helps rank search results across various fulfillment types, and created a stank ranked heterogenous list of fulfillments. Inputs to this algorithm are … , Assumption is that only confluence documents and ServiceNow SC will be ingested, the algorithm should consider the entire document and not just the title .. the output should be a stacked rank of documents and SCs, with confidence levels normalized across all sources, the success of this algorithm should be tested by comparing with resolved tickets where multiple fulfillments were available in current tenants.
+<Requirement 2> Search Indexing:
+<Requirement 3> Automated Search Jobs:
+
+Risks
+Identify scenarios that could make these requirements risky. E.g. >X TB data set
+
+Dependencies
+Identify dependencies at a high level
+
+Success criteria:
+How would our customer measure overall success of these requirements: E.g. Algorithm should be able to process 5K Documents and 300 SC with 1000 items per catalog in X sec. When compared with successfully resolved requests in our tenants where multiple fulfillments were possible, The algorithm’s suggestion should have a success rate of 90%
+
+Initiative details:
+Product Area
+
+Business Objectives:
+
+Product Manager:
+
+Technical Lead
+
+Data Science Lead
+
+QA Lead
+
+Program Lead
+
+Document Versioning & Approvals:
+Document Version
+Description / Comments
+Approved by (PM Director)
+Approved by (Dev Director)
+Approved by (QA Director)
+
+
+
+
+
+
+
+
+
+
+Appendix:
+Add any additional content that may not fit in above sections

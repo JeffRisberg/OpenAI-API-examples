@@ -1,0 +1,267 @@
+Jeff Risberg
+My goal in this meeting is to identify what needs to be developed in order to meet the work plan. And so I've been looking at (I'm assigned to) the elements of the work plan that are about the overall copilot blueprint. Wwe should start by bringing up the slide that covers what's in that, and then go into more of the associated details.
+
+So here is the slide, and showing how some of the project deliverables are being tracked. Over on our side, we have a Google Drive folder, and we do have a list of what are the portions of the copilot blueprint.  The work plan says these four things, which are detailed strategies, minimum viable feature set, human in the loop, rapid prototyping of features in order to gain feedback from users, and then some staffing and budgeting.
+
+So what I've been doing is following through on what Maya was describing and learning from the conversations you and she were having about career preparation and launch and how that tied into different pain points. And then I began to look at the minimum viable feature set, and then what's, what's been, probably most important in these discussions is to come up with examples of what human and the loop elements actually are and actually and I think that you and I are in agreement on what some of those could be.
+
+We listed those in the email that you and I were commenting on during this morning.
+
+Jon Siapno
+oh yeah, there we go.
+
+Jeff Risberg
+So basically, here was one set of what, what is a human in the loop system all about, and it's primarily the escalation paths and director feedback mechanisms and then additional ways of clarifying different requests, and then continual learning and audit trails and transparency, as I see it, the escalation path portion is probably the most, probably the most important one. And so what I began to do was work, was look at it from the perspective of what information goes into a data model of a development level. So from there, what I've been doing is sort of reverse engineering the data model that you, that you must have created. And what I did was I worked from one document, one document that you and Su yen have provided, which is saying that for every one of the user accounts, you're keeping track of the following fields, and then that would be kept track of on id’ing by the phone number of the individual user (i.e., the SMS phone numbers). Is the unique identifying information it would it would be helpful, for instance, to keep track of the user's first name and the last last name, primarily because, if we're going to create a screen that is for the advisor SQL at the advisor of school at would want to know who was the student that was actually experiencing this particular issue. And so that was the kind of thinking that led me to begin to draft a data model like this and put it into my SQL group. And then what we did, starting a couple of weeks ago, was using the openAI assistantAPI, again, based upon what you have been describing to us.
+
+And then from there, we began to work on what functions should be incorporated into the basic interaction. We can revise the instructions in any way that is appropriate. If I run through a brief demo, which is the best way of showing, of showing some of this if we each one of the user demo accounts is built off of someone's SMS phone number. So here I'm creating a thread for the user whose phone number is 55511212,
+
+let's say I want to, I want to go to college, making a call over To open AI, then providing information, and in this case, based upon the way that the prompt is written. It's making its answers contingent upon what the user's stress level is. So then what we could do is we could say, say my stress level is low,
+
+and now what it'll do is run the associated tool function, which is to save the stress level into the database. And we can take a look at the database content
+
+Here is a dump of the student table. Phone number is 1212, it has changed the stress level down to five, which is sort of the medium level. So it basically took a combination of the interaction with the LLM, the running of the registered tool, tool functions, and then and then carried out an operation to write, write that to write that information. And then, now that we've indicated what the user's stress level is, it's able to come up with reasonable answers that are content, that are conditioned, that have been conditioned upon what level of stress the person, the person is in. You see all of these, all of this goes back to a conversation you and I had back in late October, early November, in which you were describing that the important fields in user state information were something about stress and motivation. You pointed out how it was a value from one to 10, but it was never really clear how you were deriving that information or using it. So therefore, what we began to do was come up with some sort of simple guidance, but like have the stress level be related to the level of detail in the in the instructions, because if the aspect mechanism is working, then the then the fact that we're reporting stress level could be a filter for the escalation. Because really, to me, the important aspect of escalation is you're detecting something about the state of the student. You are reporting information such as stress or motivation or whatever you then want to generate a query that is saying, is the student above a certain threshold, the level of stress or some, some other metric, and if so, then send a notification to the advisor, administrator or parent, or whoever, who is associated with that student, is what I've been describing and showing so far, similar to the implementation that you had.
+
+Jon Siapno
+Yeah, this is really similar. Jeff. I mean, I think this is really exciting to see in this way. I feel like you, I just feel that you really put in some effort to really understand what the current capability is and expand upon it. But this is, yeah, this is really exciting to see.
+
+Jeff Risberg
+Good, because we've got one technical volunteer to help me. She works as a solution architect at a similar AI startup, and she and I both work on projects during the week at our companies, but then on the weekends, we work on your project. And so to me, the main key pieces of the of the salute of the implementation are the open AI assistant API, the selection of the selection of a database to record information that is more than just what's in the chat history, the idea that there are threads built for each one of the accounts, because that way the threads are managing what those those accounts are, and then the registering function. Function calls if the user says that, my stress level is why I want to, I want to make that be recorded, or do the same thing. For the motivation level, we may need to look up the account information given the person's SMS phone number when they started the interaction. So coming up with the facilities in the open AI API for doing tools and functions was another hassle. You probably went through this before, before we did the examples were that open AI provided were good, but not great. I'm sure you found the same thing. Oh, yeah, only
+
+Jon Siapno
+a lot of trial and error to get the function calls to work correctly.
+
+Jeff Risberg
+So in fact, I have a whole document of all of the trial and errors, but the result is that we can now manage the threads so that if I say, I would like, I would like to go to Stanford, it will record that in the thread for now. Here, this is about Stanford. Now let's, let's imagine that we're logging in as another user from a different SMS number. I've got dummy SMS accounts with 5551212, on up to one three. So in this case, this person is saying, I would like to go to USC. Now we can record that information in the thread for that user, and then if I go back to the person who was, who was on the first cell phone number, and I asked them, what school were we? Were we discussing? It should remember that this person had asked about Stanford, and sure enough, they pulled Stanford out of the conversation history, and has also been keeping track of the motivation level and stress level of that person during flow is managing the thread support for each one. And then I'm sure your system works the same way, which is that the assistant ID and thread ID are retained in the database records so they can be, they can be looked up later.
+
+Jon Siapno
+Yeah, yeah, that's awesome. And so Jeff, if I'm understanding, so when you let's say create, let's say a new instance with a certain phone number, so it's retrieving both the thread from open AI threads and any data stored in your MySQL.
+
+Jeff Risberg
+That's right, because the thread is the thread information. All of the fetches are keyed by the SMS phone number. Yeah, we say. So we say, get stress level by SMS phone number. And likewise, when we are looking up the likewise, we check to see there's a there's a map that's recorded that connects thread IDs over to SMS phone numbers, and if we haven't created a thread for this, for this phone number, then it will create a thread at that point and write that into the database. I see, otherwise, it will use the api thread with which it found. So we've been able to manage the existence of the threads. And really the important test is what I was just showing you, which is thread A is a person wanted to go to Stanford. Thread B is a person wanted to go to USC, like that in the past two Stanford team meetings, we've been showing a little bit of this development process. It only began to work about about two or three weeks ago.
+
+Todd Logan
+You've been using AI to help during the past
+
+Jeff Risberg
+because our be because
+
+Todd Logan
+I appreciate it my contribution here, I don't think it's probably
+
+Jeff Risberg
+the counselors or adults
+
+Todd Logan
+as well information.
+
+Jeff Risberg
+And so there's a field in here that says, Are you a student? Are you an adult, or are you the assistant administrator? And then describe the relationship between any two accounts. So what we can do is we can say that account, 5551212, as an advisor who is on some other SMS number and has a different name and has some other conversation history, and so what? So the reason why I sent you the data model snapshot on Monday was mostly to confirm these fields here and then the data snapshot from two days ago, which I have not yet central over over to you, has the idea that there's peer and advisor and parent relationships between any between any pair of accounts. Because in that way, if the system is detecting that there is potential escalation issue on a student's account, it looks it up in the database. Who is the account of that person's advisor or parent?
+
+Jon Siapno
+Yeah, that's yeah. That's yeah. That takes it beyond what its concurrent capability is. That's awesome.
+
+Jeff Risberg
+This begins to address the first line of the discussion about human in the loop, which is escalation to the to the human. You see, it wasn't really clear from any of the previous discussions where the non student humans were fitting into the system, right, right? So what we did was we said every human has an account, and every account is one of, say, three different roles to distinguish between the students and the animals, and then there's some relationship between the students and the adults so that we can say that student ID one as account six as their advisor, and student two as account six and the sixth account is this adult who is Carroll counselor, or this other rabbit, who is Christine counselor, and then I've got many students in here, like John Smith and Sarah student, Larry Lerner and Peter. Pupil, you probably had a similar, basically test data set at a similar stage for what you were doing.
+
+Jon Siapno
+This is, yeah, this is, this is more advanced than that. And I think if I'm if I can recap, Jeff, so you're saying, Well, when I originally envisioned the co pilot, I saw humans. I saw the humans in the loop as being staff members, but this architecture allows us to identify the humans within a student's circle that may not be making way of staff members, which is a key difference. And I think that that's, yeah, that's awesome. It's a good
+
+Jeff Risberg
+The important parts are that every account record has a role, such as adults or whatever, and then every account has its own thread ID, because if I'm logged if I'm logging into the system as the counselor, I still want to be asking questions of the LLM, and what I want is the LLM to be able to either use my thread ID, or I'm asking questions like, how many students are above President stress level five, because the LLM should be able to run that database query and then produce that kind of report, or I should be able to say, using the information in this other thread, come up with the answer that such and such a student would have experienced, or might have experienced. And so again, for that reason, all of the in addition to having the thread of the open AI system recording all of the messages, we also put the messages into another table, because this gives The the administrator and counselor access to the message information, because what they're going to want to be able to do queries against the messages, I would imagine, and say, did any student, did the student ask about college, such and such, or did this student ask about this particular topic or whatever. And so that was why, in addition to managing the threads to keep the LLM happy, you want to preserve in the database information that would keep a advisor, counselor, Administrator, yeah, in the last email, you said you were describing something similar, where the each one of the administrators would have a mutual account or virtual ID, and then that would be conditioning what information that They were seeing. What we tried to do was, instead of every administrator having an account and then having the accounts associated with a tenant. Each tenant is describing one organization that is using the COVID. And this relates to another part of the conversations that we have in our team, which is, it's becoming really clear that there's a variety of potential partnerships and ways of connecting organizations that should be important in the evolution of any One of these chat bot, chat bot by projects. So what we tried to do was Express at Data Model level that there would be multiple organizations participating, and maybe some of those organizations are entirely distinct, partner organizations, maybe not. But we wanted that into the data model as a way of expressing such information. And so in the sample population, we put in waves as tenant number one, two high schools as tenant numbers two and three, mostly just to show that the data model is captured during that kind of information. And then, and then the administrators would be logging in using some administrative URL, something, something like, like, like that. So that was what we've been building so far. One, one detailed question I have is the open AI APIs are available in both JavaScript and in Python. Are you using the JavaScript version?
+
+Jon Siapno
+We're using the JavaScript version.
+
+Jeff Risberg
+We picked the right one. I had to go. I wanted to ask that question two or three weeks ago, but, but I, but I didn't. Didn't know whether you were ready to discuss those types of details, so I had to guess on it. I even connected to Sue Yen to see if I could ask her, but by that point, she said that the contract had already ended, and so she no longer had very many, very many details. So what I can do is give you access to this via repo, where we're basically collecting all of all of this stuff, or I'll just send you excerpts where the two most important excerpts really are the data model and the and the fields that go into the fields that go into the call to assistant create, which is the instructions, the registered functions, and then the main loop is pretty, pretty much. So really, my goal in this conversation is to see how we can reinforce each each other's work and create effective prototypes of human interaction, and then continue down that list of the next three or four aspects of human interaction. I agree that there's about seven different items on that list. And you correctly pointed out that some of the trickier ones are things always learning and keeping track of confidence indicators. I've basically been doing all of that kind of work for about 40 years.
+
+Jon Siapno
+Wow, that's amazing. That's yeah, that stuff I don't understand. And yeah, would love to lean into your
+
+Todd Logan
+exercise there. So let me jump in at this point so you could see that Jeff and some of the volunteers he works with have a lot of capabilities as far as prototyping. And obviously, I think being able to adequately prototype a human in the loop approach is one of the key aspects of the work we're doing right now. I guess I'd like a little more feedback from you. Is this consistent with your own thoughts about how a human in the loop system would work. And then also, I mean, I think Jeff needs help. He's already gone above and beyond with his group in doing this prototyping. Thus far, I want to make sure. And he's been, you know, he's worked, obviously, from a lot of information you've provided him, but we should really make sure that any you know, the additional work that he and his volunteers might do, the prototypes are focused on the things that you think are most important that might differentiate co pilot from other systems out there and essentially not use their time as wisely as possible. Yes, yeah, that's a good call. Todd.
+
+Jon Siapno
+This is, this is consistent with how I how I am thinking about my co pilot. I think what I'll highlight now are places that that may differ from what's that are that maybe a little that may go beyond what's already here, just in terms of, just in terms of new thoughts I've been thinking of, just as it relates to the interviews I've been doing with Maya and then our new researchers that we just brought on, let's say just two weeks ago or three weeks ago, not too long
+
+Jeff Risberg
+ago, right? We saw the document from those researchers, and we were really impressed with the level of detail and diligence that they were following. Yeah, yeah. In addition to them doing some competitive analysis and doing some message traffic analysis, they were also gathering some of the important use cases of an advisory system, and to me, that list of use cases was really the most, most important part, because that drives some of the forward direction.
+
+Jon Siapno
+Yeah, yeah, it's a really great team. Molly and Sarah are really fantastic in terms of the human in the loop features. One thing that I want to consider is, how might we introduce a student to, let's say, a volunteer industry professional who might want to give who might want to meet. Well, one of the things I've been thinking about is, how might the co pilot match a student to some adult volunteer who might be an industry expert, and you know my kids, you know even just share a link to a Calendly page, or somehow make an introduction, or actually, you know, what I've been thinking of is potentially, it shares the URL to this person's LinkedIn page and coaches the student how to make a contact through LinkedIn so we don't need to build another messaging platform or another place to meet
+
+Jeff Risberg
+with the system, identify relevant mentors and organize some of those.
+
+Jon Siapno
+Yeah, yeah. So maybe let's say I am, let's say, let's say I'm a firefighter, and I want to, you know, share my knowledge with students at making waves. So maybe I log in as like industry volunteer, and, you know, somehow I share what my areas of expertise are, plus my LinkedIn URL, firefighting in the Bay Area, then maybe, as a student is having a conversation, the co pilot learns that they are in the Bay Area and they're interested in firefighting, it might suggest, hey, there's someone that that You might benefit from talking to here's their LinkedIn URL. Here's what you might say to message them. And so maybe it matches like that.
+
+Jeff Risberg
+Actually, you answered every part of the question, except for how does it do that? Give you that answer? Because we do that all the time on our systems. The strategy that is generally used is if you identify similarity between a piece of text that's describing a person's abilities and a piece of text that's describing a person's needs or interests. And so what we do is we use a neural model to encode that text into a word vector, and then we use oversight similarity against the word vectors to identify those matches that are above a threshold level. And then we show the top ones. Wow. This is the place where Aisera applies. This is we do a lot of projects where there's different HR documents that are being that are being processed in the system. And so if you might bring in 5000 HR documents, which are about everything from vacation policy to 401 K policy to green those policy to whatever. Actually takes 5000 documents to capture all that information, and then we convert all of those into word vectors, and then we do a similarity match using cosine similarity to bind them which are above the human threshold, and we show the results. So actually, so examples of doing this in a number of books about neural applying neural semantic search to to an AI system, and we
+
+Jon Siapno
+can do that next
+
+Todd Logan
+weekend. So let me
+
+this. This doesn't seem to be totally consistent, I think, with my thinking of human in the loop, let me interject a different perspective and see if They both might be important here. So we've been talking about finding sources of volunteer mentors or coaches and training them in order to act as career coaches. And so there's a whole other discussion about what's appropriate training. How do you train these people up and ensure quality and all that? But let's assume that you do do that one of the key actors in this system I look at as being this coach, and it's, you know, be all the much better that the career coach is own industry. Area of expertise matches with the students interests. But I think that's going to be the exception, in large part, because my perception in these student interviews is a lot. Few of these students know what they want to do, what industry is most interesting to them. So a lot of the early interactions between this coach and the students is going to be along the lines of helping the student. I mean, I think ideally helping the student get to know themselves, getting to know what their interests are, what their skills are, what their preferences are, you know, and start to build it just conceptually. Start to build a Venn diagram of here's a student. Here are various industries and where, where might the students, preferences, interests and skills align with those industries or different types of jobs? And so I I see a lot of the coaches interacting with students in a very general way initially. So as I listened to the interaction you guys just had, I think, well, maybe there's another category of of participants in the system that we might want to consider, but I'm leery of doing putting a lot of effort into that up front, what? I don't know whether that is part of the minimum future set or not. So, yeah,
+
+Jon Siapno
+I hear that Todd, if I could, if I could just jump in here. Yeah, you know, one of the, you know, this process I went through with Maya, she was really thorough or disciplined in sticking to the problem space and not really come on and coming up with solutions as we were learning from people. But one of the key gaps seen is job seekers with a social network. So think, on one hand, there do need to be career coaches who are, you know, monitoring the system, making sure that it's the guidance is developmentally appropriate. And let's say, once the students meet these sort of minimum competency levels, let's say and are at the stage and looking for jobs that career person may not have the social capital or the social networks that they could extend to each student within their region to make a connection, a warm connection. I think that's where I think volunteers could come in, who may be willing to share their networks with a smaller subset of students on a volunteer basis.
+
+Todd Logan
+So, so what would so I sort of envisioned that the career coaches on the system would be in the cases where it's appropriate, introducing them to LinkedIn, helping them to build their LinkedIn profile. But not only that, but to use LinkedIn in order to use LinkedIn features to find potential connections and to make the connection through LinkedIn. Is that, where does that? Where is that insufficient? I guess
+
+Jeff Risberg
+the way to do it is to put into the the data records of the of the of the chat box, information about a number of potential experts, one of those experts having a statement of capabilities expressed as a bunch of text which is extracted from their resume or other LinkedIn information. And then what the chat bot is doing is say, if the user says, can you tell me who is who also knows about ecology, that the system is going to do, one of those similarity matches that I was describing against the set of records of experts who are and One of the fields on every expert or account would be their LinkedIn ID. In fact, we can start doing that right now, which is in addition to everybody's email address, we need to put in what their LinkedIn URL is defaults to unspecified, only people who are basically adults, who are experts.
+
+So now we have another role in the system, which is a expert as a sub variant of adult experts would have LinkedIn profiles, and every expert would have some sort of statement of skills. And then the statement of skills gets converted into the AI learning vector, and then we do matches against statement
+
+Todd Logan
+of skills. So let me okay, I'm just gonna be devil's advocate for a second, and that when you look at a connection within LinkedIn, that connection, the appropriateness of the connection, may be based on expertise, but I would argue the majority of the time it's based on their network. Meaning, I don't care if someone's an expert in the field, but if this guy knows a whole bunch of people in in finance,
+
+Unknown Speaker
+okay, right?
+
+Todd Logan
+Then they're a great ideal connection for me so and so. I'm not sure that the expertise model is totally consistent with how I sort of see LinkedIn connections being valuable to the students. Well, okay, we might not be, but
+
+Jeff Risberg
+what I'm saying is that managing a list of documents about people and skills should be an important part of the minimum viable product. Okay, performing smart similarity matches against that list should be an important minimum part of the product, and then that minimum part is used at a variety of places in the conversation, such as, I need you help finding such and such that would trigger the similarity match match logic. And then further, particularly for those accounts that are about experts, we want to keep track of not just their name and their email address, but also their LinkedIn address, because then the system can say, Okay, you match these five experts. Here are their LinkedIn here are their names and their LinkedIn accounts and a brief file each one, because now what we're doing is addressing what Todd you're describing. The use case of the chat bot is providing the student with some information about experts that that student might not otherwise have okay.
+
+Jon Siapno
+You know, to zoom out, addressing a person's addressing a job seekers. Social capital or lack of social capital, is going to be a key part of find a job. And so I guess the way it actually shakes out, it's less important so long as we can agree that first, I mean some degree of social capital to help find and land a job, potentially, you know, the hidden job market.
+
+Jeff Risberg
+So how do we represent social capital in a in a representation database, knowledge base, whatever? Yeah,
+
+Jon Siapno
+so this actually connects to the second way I think that something that's happening now differs from what's currently here. And so one of the areas I've asked Molly and Sarah to do a deeper dive in is is in social capital, and then how we might assess for that, and then story that story too. So that pay. The jury's still out on that. But in addition to like, motivation, stress, help seeking, resource awareness, one of the category, ninth category, potentially, is social capital. But, but to your question, Todd, earlier, as to how you know searching on LinkedIn may be insufficient. I think it's in actually, you know this, I guess this, this, we can still talk through too. I think it is an important skill to teach someone how to search on LinkedIn on their own. And yet, some people are reaching out and maybe not hearing back. It's a potentially, there might be a short list of people you know connect directly with making those who say, hey, yes, I'd love to volunteer my time to speak and to speak to someone, and maybe they're more likely to schedule a coffee chat.
+
+Todd Logan
+Okay, sure. I
+
+Jeff Risberg
+Of all those careers, we represent a person's social social capital, because it's the right word with a lack of definition. Okay, so
+
+Todd Logan
+let me jump in and just do a little bit of brainstorming. I mean, I would say, if you look at an end of someone graduating from college, you might be able to represent their social capital based on their parents and their parents connections, their extended family and their extended family's connections, their college friends and their friends connections. And if you want to be more on the automation or the automation side, it could be on your LinkedIn connections, and the connections of those you're connected to in LinkedIn, following the whole hierarchy that LinkedIn is created, right? Yeah. I mean,
+
+Jeff Risberg
+I agree with that more than you realize, I agree with that is our AI Director came from LinkedIn, and developing that capability within LinkedIn really has been redeveloped within the icera system. So, okay,
+
+Todd Logan
+yeah,
+
+Jeff Risberg
+I agree with all of those statements. Fundamentally, my question comes down to kind of managing the scope of a kind of tool that ends up being wrapped around LinkedIn, which I think would be really valuable. It essentially would be a system that is a kind of guide to a student to make use of the capabilities of what LinkedIn has has done, and from there, I'm trying to figure out what parts of
+
+Todd Logan
+Yeah, so
+
+Jeff Risberg
+what parts are done?
+
+Todd Logan
+Well, I just wanted just as a sidebar, LinkedIn is only appropriate, I think, for some sorts of career paths. So it's extremely important we should be, you know, keeping that in mind, but at the same time, you know, some some students are gonna be on different career paths where LinkedIn isn't nearly
+
+Jeff Risberg
+as valuable, and in turn, that would be part of the competitive advantage that we would want to be demonstrating and documenting in our in our team's work, which is what we're saying is LinkedIn is a good example of a resource for identifying relevant experts or knowledge is not a sufficient one, because many of our students want to explore more careers that are other than what's in LinkedIn. So therefore the co pilot is providing a subset of LinkedIn capabilities, which is matching a version of social capital that we are creating that helps represent how a student about the world and therefore ends up being able to provide some sort of useful matches against the set of experts who are registered in the system, some of them have LinkedIn URL, so some of
+
+Jon Siapno
+them don't, you know if, if I'm thinking about just this last batch of Internet, and I did. I mean, we could, at a minimum, define social capital as, does this job seeker know an industry insider who shares their identity. And in the within the context of the interviews, it's been people who, you know there's either they have the same last name, or they come from the same, you know, religious circle, or, you know, they're, you know, however they might describe themselves, racially or ethnically. But if we look at the project pasta and add an element from there, I think it would be an industry insider who has a senior level role and shares some aspect of their identity. And it could be we share the same last name, or maybe the identity is we went to same school or studied the same major. But there needs to be some, you know, I think the AI can help match, help identify which parts of their identity, however they may define it, have some overlap, in addition to they're an industry insider and then have some senior level role. Okay,
+
+Jeff Risberg
+here's one question that I was not clear on. How do you set these various bits that are in the user that are in the user record? The document says there's a bit for help seeking a bit for each one of these. And I copied those definitions down into those code, but I don't have any idea how the problem actually uses that information.
+
+Jon Siapno
+Yeah, it doesn't use the information, but it would store it as enumerating yes or no, enumerating Y or N.
+
+Jeff Risberg
+But under what conditions are those fields set or cleared
+
+Jon Siapno
+they we don't have specific conditions, and so it's what I'm doing, is we're doing a function call within the assistance API to say yes, if they are in school or no if they're not in school. So it's not much. It's not much than a but not much more than a simple one or two sentence prompt within each call. And so
+
+Jeff Risberg
+what? What? What sort of phrasing or input by the user triggers that function call?
+
+Jon Siapno
+Oh, yeah. I mean, it would be, yeah, it could be very direct or maybe very indirect too. So there isn't, there isn't a list of phrasing. It's, I'm just asking the opening. I'm just asking the assistant to read all the input and to decide itself what to call any, any single or combination of function calls. And so if it believes it's mentioning, if it believes the student is mentioning that they're in school or just finished school, it might infer that they are not in school, or, you know if they're not, if they're saying that they're not going to be. I'm not being very clear, but, but there isn't, there isn't a defined set of trigger words or phrases. It's just, it's part of one of the overall instructions in the assistant, which is phrase, as you said, if the user indicates that they are in school, then all this function with the flags, with the flag set true that person's user record, yeah, yeah. Or if they're saying, hey, I want to re enroll, it would infer that they were not in school,
+
+Jeff Risberg
+right? Okay, yeah, I figured out how to handle setting and getting a motivation that's stress fields. Because if I tell you my stress level, then report it in the database, that triggers the function call to do set stress level. If I tell you my motivation level, recorded as my motivation level the database. And so what you're saying have instruction that says, if I tell you that I am a enrolled student, then set such and such, apply again the database, and then those and then those values once set are not really being used. Are
+
+Jon Siapno
+there? It's not querying our MySQL, but it is recalling the conversation history, right? Yeah, yeah, but it's not, it's not
+
+Todd Logan
+from MySQL. I don't know if I understand that exchange there. So the interaction between the AI and the student will be different if their stress level is at medium versus stress level at very high. Not true in the
+
+Jeff Risberg
+implementation, but my developer and I were proposing the way that information on stress level was being used was to really increase the level of detail, or lack of detail came out. And so if a person is very stressed and you ask for a bunch of schools, it pretty much is giving you just the names of the schools. If the person is not too stressed, then it might give you the name, address, information, more detail about the school, see what we want to have the amount of text in the response be related in some way to the user's perceived ability to handle. But that much so
+
+Todd Logan
+I would have thought my intuition would have been that you would be willing to make more complex requests of user if their stress levels is low, and then if it's higher, you'd want to be much more well. First off, if I remember the system correctly, it suggests that if your stress level is high, it's actually suggesting that you do some things in order to organize your activity and take on smaller chunks of smaller challenges In at a time, is that? Is that about, right?
+
+Jon Siapno
+Well, this okay, let me see. So right now the system is, the co pilot is reporting this information, and it is. It's not changing anything about the way it operates. And so it's, it's, it's, you know, just having conversation with the person and it might prefer, okay, well maybe I'll tell them things down if their stress is high. But one way that it could, you know, change the way the system works is maybe, maybe the follow up messages trigger more frequently if the stress level is low, but it doesn't do that right now. So I'm not claiming any information from the MySQL database to affect how the co pilot works other than or an administrator, just to view what's been rewarded.
+
+Todd Logan
+I don't know what the state of the art is here, but I do think that this is actually probably the weakest part of AI's interaction with humans, right? That this is both
+
+Jeff Risberg
+the weakest part and the part that has most potential.
+
+Todd Logan
+Okay, I agree with that. What you end
+
+Jeff Risberg
+up this is really called prompt engineering. And prompt engineering is a tedious exercise in describing what you want the AI agent to do, and sometimes you're expressing it in more or less Boolean logic. If such and such is true, then do that. Other times you're expressing it in less specific, which is, if user has hinted that such and such is true, then do that. And essentially, our people spend a lot of time on refining these prompts and corresponding instructions in order to convey some of those nuances for months or longer.
+
+Jon Siapno
+Yeah, I think Yeah. And I see it's, there's definitely opportunity to improve the co pilot. I think you know where my sense is that where we where the co pilot could probably make a difference. Biggest difference in a job seekers journey is helping them get connected to industry insiders that they may not already have. And I think working backwards from there. So I think based on what the co pilot learns if the person has a resume, or if the person doesn't have a resume right there, they don't have a cover letter, start coaching around cover letter. Or if they don't have a mentor, industry decider, start coaching there. But
+
+Jeff Risberg
+the correspond to some of these flags that are in the user record, if you have a mentor, if you have if you've identified a career, if you ask for help that says, Do you have a resume? Do
+
+Jon Siapno
+uh, potentially, potentially, you know, potentially, potentially, potentially. And I say, I say that because I think these eight motivation, stress, help, seeking, resource awareness and maybe social capital at night like that, those would be like a defined outcomes that we are looking when we look at a cohort, we want to see those things move. But I think whether or not a person has a resume that's less important to or an ethic less important to us from an efficacy perspective, but maybe more important to the co pilot in terms of what information it will fall apart with the person on, just specific to that in the short term.
+
+Todd Logan
+So that's great. You know? I think we have the we all know that the student needs to have resume, and we're not. Right now, the process within making waves doesn't seem to guarantee that, right? So somehow we need to fix that. But I think in parallel to that, you need to have an agreed upon process by which a student is developing a career strategy, for lack of a better term. So, and it's certainly not, let's go find you know it's not about job boards. It's really about narrowing down the students. First off, guess understanding on the Venn diagram what kind of job they're looking for, what kind of company they would probably thrive in, and then being able to narrow down to probably no more than a dozen companies that they want to target and that that would help them in understanding, like, what kind of networking makes the most sense for targeting. So part of it would be using LinkedIn to try and find, not necessarily experts, but people within those companies that are knowledgeable about the companies might be willing to help me. It could also lead to, you know, what kinds of industry events could I go to where I would learn more about those companies, or meet some of the people that work for those companies, or something like that, and most of the, I mean, a career coach is going to sort of lead you towards pursuing a strategy like that. You may end up with a totally different company, but it's a lot easier for the people you're networking with to interact with based on your already having some direction and questions about those organizations that seem to be where you would be a good fit, right?
+
+Jon Siapno
+Yeah, let me see that.
+
+Jeff Risberg
+You start winding up this.
+
+What's a good way to continue this, this process? Because what I'd like to do is go through one or two, maybe two more, weekly, weekly revisions between now and the middle of January, so that when we have the midpoint meeting, which is just after the middle of the middle of January, it's clear that we can show that we've been collaborating on identifying and Providing sessions on early implementation of these various features.
+
+Jon Siapno
+So I think what would be helpful is if you shared the GitHub repo, and then I can so I can just take a look to see, you know what, what's all there. I think that would be super helpful for me. And I think with you too. Todd, I think it could be interesting to see. You know, with Maya and I, we identified the pain points we agree on what solutions we think will effectively address the most important pain points, or at least the pain points we would want to address. Okay, then we can prioritize what feature set or deliver on those insurance for each grade point
+
+Todd Logan
+going over. But I also just wanted to ask you market. Wanted to ask you, like for what you know about career villages, Coach system, how you see that being different than your vision for co pilot? Or should we table that and have do that in a different conversation? Yeah,
+
+Jon Siapno
+it's a good question. I'm not sure how we I'm hoping we can tease some of that out in the competitive analysis to you know, we know Jared the CEO, so we so I know a little bit about what he where he wants to take coaching career village, but it's a fair question to ask.
+
+Todd Logan
+Okay, well, I appreciate and team. Appreciate you highlighting them. If you have time and have some other thoughts you could share with us that'd be helpful as well. Okay, who's trying to get to speed as quickly as possible on some of these organizations, and I don't want my team to be totally dependent on what's available from their website. If you know more, yeah, have other insights that'd be helpful.
+
+Jon Siapno
+Okay, yeah, sure, I can share what I know of what Jared has shared to me about okay, Village.
+
+Todd Logan
+Okay, great, yeah,
+
+Jeff Risberg
+all right. So what I'm going to do is that is package of one or two loose ends in this repo, and also augment the readme
+instructions so that you can actually get more out of it and begin to directly run it if you want to. Then I'll send you the access code, then I'll share the repo with you in the next next 24 hours, then I'm meeting with my developer on Wednesday afternoon, because it's a New Year's Day, so she set aside on Wednesday afternoon.
+And then do you want to meet again on Friday or on next Monday? Or what sort of schedule?
+
+Jon Siapno
+anytime, Friday actually better
