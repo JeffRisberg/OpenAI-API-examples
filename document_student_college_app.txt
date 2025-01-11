@@ -1,0 +1,93 @@
+We need a system to track our student's college applications.
+
+Students need help learning about colleges and identifying what matches their skills and interests.
+They need support getting applications filed.
+They don't know what tests to take.
+
+So basically, here was one example a human in the loop system all about, and it's primarily
+the escalation paths and director feedback mechanisms and then additional ways of clarifying different
+requests, and then continual learning and audit trails and transparency, as I see it, the escalation path
+portion is probably the most, probably the most important one.
+
+We are  saying that for every one of the user accounts, you are keeping track of the following fields, and then
+it would be kept track of on id’ing by the phone number of the individual user (i.e., the SMS phone numbers).
+This is the unique identifying information.  It would be helpful, for instance, to keep track of the
+user's first name and the last name, primarily because, if we're going to create a screen that is for the
+advisor at the school at would want to know who was the student that was actually experiencing this particular issue.
+We drafted a database like this.
+
+Here is a dump of the student table. Phone number is 1212, it has changed the stress level down to five, which is
+sort of the medium level. So it basically took a combination of the interaction with the LLM, the running of the
+registered tool, tool functions, and then and then carried out an operation to write, write that to write that
+information. And then, now that we've indicated what the user's stress level is, it's able to come up with reasonable
+answers that are content, that are conditioned, that have been conditioned upon what level of stress the person, the
+ person is in. You see all of these, all of this goes back to a conversation you and I had back in late October,
+early November, in which you were describing that the important fields in user state information were something about
+stress and motivation.
+
+It has a value from one to 10. So therefore, what we began to do was come up with some sort of simple guidance, but like
+have the stress level be related to the level of detail in the instructions, because if the aspect mechanism is working,
+then the fact that we're reporting stress level could be a filter for the escalation. Because really, to me, the important
+aspect of escalation is you're detecting something about the state of the student. You are reporting information such as
+stress or motivation or whatever you then want to generate a query that is saying, is the student above a certain threshold, the
+level of stress or some, some other metric, and if so, then send a notification to the advisor, administrator or parent,
+or whoever, who is associated with that student,
+
+Good, because we've got one technical volunteer to help me. She works as a solution architect at a similar AI startup, and
+she and I both work on projects during the week at our companies, but then on the weekends, we work on your project. And so
+to me, the main key pieces of state of the implementation are the open AI assistant API, the selection of the
+selection of a database to record information that is more than just what's in the chat history, the idea that there are
+threads built for each one of the accounts, because that way the threads are managing what those accounts are, and
+then the registering function. Function calls if the user says that, my stress level is why I want to, I want to make that
+be recorded, or do the same thing. For the motivation level, we may need to look up the account information given the
+person's SMS phone number when they started the interaction. So coming up with the facilities in the open AI API for
+doing tools and functions was another hassle. You probably went through this before, before we did the examples were
+that OpenAI provided were good, but not great.
+
+The important parts are that every account record has a role, such as adults or whatever, and then every account has its own thread ID, because if I'm logged if I'm logging into the system as the counselor, I still want to be asking questions of the LLM, and what I want is the LLM to be able to either use my thread ID, or I'm asking questions like, how many students are above President stress level five, because the LLM should be able to run that database query and then produce that kind of report, or I should be able to say, using the information in this other thread, come up with the answer that such and such a student would have experienced, or might have experienced. And so again, for that reason, all of the in addition to having the thread of the open AI system recording all of the messages, we also put the messages into another table, because this gives The the administrator and counselor access to the message information, because what they're going to want to be able to do queries against the messages, I would imagine, and say, did any student, did the student ask about college, such and such, or did this student ask about this particular topic or whatever. And so that was why, in addition to managing the threads to keep the LLM happy, you want to preserve in the database information that would keep a advisor, counselor, Administrator, yeah, in the last email, you said you were describing something similar, where the each one of the administrators would have a mutual account or virtual ID, and then that would be conditioning what information that They were seeing. What we tried to do was, instead of every administrator having an account and then having the accounts associated with a tenant. Each tenant is describing one organization that is using the COVID. And this relates to another part of the conversations that we have in our team, which is, it's becoming really clear that there's a variety of potential partnerships and ways of connecting organizations that should be important in the evolution of any one of these chat bot by projects. So what we tried to do was Express at Data Model level that there would be multiple organizations participating, and maybe some of those organizations are entirely distinct, partner organizations, maybe not. But we wanted that into the data model as a way of expressing such information. And so in the sample population, we put in MakingWaves as tenant number one, two high schools as tenant numbers two and three, mostly just to show that the data model is captured during that kind of information. And then, and then the administrators would be logging in using some administrative URL, something, something like, like, like that. So that was what we've been building so far. One, one detailed question I have is the open AI APIs are available in both JavaScript and in Python. Are you using the JavaScript version?
+
+We're using the JavaScript version.
+
+Let me interject a different perspective and see if They both might be important here. So we've been talking about finding sources
+of volunteer mentors or coaches and training them in order to act as career coaches. And so there's a whole other discussion about
+what's appropriate training. How do you train these people up and ensure quality and all that? But let's assume that you do that one of the
+key actors in this system I look at as being this coach, and it's, you know, be all the better that the career coach is own
+industry. Area of expertise matches with the students interests. But I think that's going to be the exception, in large part,
+because my perception in these student interviews is a lot. Few of these students know what they want to do, what industry is most
+interesting to them. So a lot of the early interactions between this coach and the students is going to be along the lines of helping the
+student.
+
+I mean, I think ideally helping the student get to know themselves, getting to know what their interests are, what their skills are,
+what their preferences are, you know, and start to build it just conceptually. Start to build a Venn diagram of here's a student.
+Here are various industries and where, where might the students, preferences, interests and skills align with those industries or
+different types of jobs? And so I I see a lot of the coaches interacting with students in a very general way initially. So as
+I listened to the interaction you guys just had, I think, well, maybe there's another category of of participants in the system
+that we might want to consider, but I'm leery of doing putting a lot of effort into that up front, what? I don't know whether
+that is part of the minimum future set or not. So, yeah,
+
+what I'm saying is that managing a list of documents about people and skills should be an important part of the minimum viable
+product. Okay, performing smart similarity matches against that list should be an important minimum part of the product, and then
+that min part is used at a variety of places in the conversation, such as, I need you help finding such and such that would trigger
+similarity match logic. And then further, particularly for those accounts that are about experts, we want to keep track of not just their
+and their email address, but also their LinkedIn address, because then the system can say, Okay, you match these five experts. Here
+are their LinkedIn here are their names and their LinkedIn accounts and a brief file each one, because now what we're doing is
+addressing what Todd you're describing. The use case of the chat bot is providing the student with some information about
+experts that that student might not otherwise have.
+
+You know, to zoom out, addressing a person's addressing a job seekers. Social capital or lack of social capital, is going to be
+a key part of find a job. And so I guess the way it actually shakes out, it's less important so long as we can agree that first,
+I mean some degree of social capital to help find and land a job, potentially, you know, the hidden job market.
+
+
+So how do we represent social capital in a representation database, knowledge base, whatever? Yeah,
+
+so this actually connects to the second way I think that something that's happening now differs from what's currently here.
+And so one of the areas I've asked Molly and Sarah to do a deeper dive in is is in social capital, and then how we might assess for
+that, and then story that story too. So that pay. The jury's still out on that. But in addition to like, motivation, stress, help seeking,
+resource awareness, one of the category, ninth category, potentially, is social capital.
+
+as to how you know searching on LinkedIn may be insufficient. I think it's in actually, you know this, I guess this, this, we can
+still talk through too. I think it is an important skill to teach someone how to search on LinkedIn on their own. And yet,
+some people  are reaching out and maybe not hearing back. It's a potentially, there might be a short list of people you know connect
+directly  with MakingWaves are those who say, hey, yes, I'd love to volunteer my time to speak and to speak to someone, and maybe
+they're more likely to schedule a coffee chat.

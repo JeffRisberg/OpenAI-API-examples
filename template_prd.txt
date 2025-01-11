@@ -1,4 +1,4 @@
-Product Requirement Doc <Initiative name> ..Ver 1(DRAFT)
+Product Requirement Doc <Initiative name>
 Ver 1
 * 1 Overview:
 * 2 Use Stories:
@@ -63,15 +63,6 @@ Description / Comments
 Approved by (PM Director)
 Approved by (Dev Director)
 Approved by (QA Director)
-
-
-
-
-
-
-
-
-
 
 Appendix:
 Add any additional content that may not fit in above sections

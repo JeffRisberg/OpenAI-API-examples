@@ -1,0 +1,55 @@
+
+
+We need to build a system which will provide automatic tracking of manufacturing problems.
+
+There are about 5,000 parts in our inventory.
+
+Our factory builds advanced bicycles.
+
+cost control is an important issue, because some parts are quite expensive.
+
+The types of bikes are Virgina-class, Seawolf-class, and Columbia-class.
+
+The pieces of a bike are:
+* frame
+* tires
+* handlebars
+* front gear
+* back gear
+* seat
+* light
+* back reflector
+
+
+We would like to keep track of the inventory of each part, each day.
+
+when new parts arrive, we must update the inventory
+
+IF a part fails during assembly we will create a part manufactoring failure report.
+The report will contain information about the part and the step of manufacturing when it failed.
+
+I have working locations in Easthampton and Westhampton.
+
+we can look up the prices of parts from a database.
+
+the steps associated with building a bike are:
+* form the frame
+* attach the tires
+* attach the back gear
+* attach the front gear
+* attach the handlebars
+* attach the seat
+* fasten the light onto the front
+* fasten the reflector onto the back.
+* ride the bike around the factory once.
+
+If any step fails, then skip counting all of hte steps afterwards.
+
+Here is a dump of the part table. Part number is a five digit code, the vendor code is a four-digit code.
+
+During assembly, we will measure what the frame's stress level is, and if the stress level is less than 30 pounds, it is considered
+to have failed.
+
+When we attach the handlebars, if it fails, we will try to grind down the edges and try again.
+
+The input screens should validate all part information against the part table.
