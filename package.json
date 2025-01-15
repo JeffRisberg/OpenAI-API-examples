@@ -7,7 +7,9 @@
     },
     "license": "ISC",
     "dependencies": {
+        "axios": "^1.7.9",
         "dotenv": "^16.4.7",
+        "llamaai": "^1.0.4",
         "openai": "^4.77.0"
     },
     "packageManager": "yarn@4.5.3"
