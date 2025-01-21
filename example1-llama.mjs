@@ -2,11 +2,11 @@ import LlamaAI from 'llamaai';
 
 const apiToken = process.env.LLAMAAI_API_KEY;
 
-const llamaAPI = new LlamaAI(apiToken, 'https://api.llama-api.com');
+const llamaAPI = new LlamaAI(apiToken, 'https://dev6.api.aws-006-us-west-2.aisera.cloud/llama8/v1');
 
 async function main() {
     const apiRequestJson = {
-        "model": "llama3.1-8b",
+        "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
         "messages": [
             {role: "system", content: "You are a helpful assistant."},
             {

@@ -4,7 +4,7 @@ import LlamaAI from 'llamaai';
 
 const apiToken = process.env.LLAMAAI_API_KEY;
 
-const llamaAPI = new LlamaAI(apiToken, 'https://api.llama-api.com');
+const llamaAPI = new LlamaAI(apiToken, 'https://dev6.api.aws-006-us-west-2.aisera.cloud/llama8/v1');
 
 const readlineI = readline.createInterface({
     input: process.stdin, output: process.stdout,
@@ -63,11 +63,12 @@ async function main() {
 
     // Execute the Request
     const response = await llamaAPI.run({
-        "model": "llama3.1-8b",
+        "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
         "messages": messages,
         "stream": false,
     });
 
+    console.log(response);
     console.log(response.choices[0].message.content);
 
     // Log the first greeting
@@ -85,11 +86,12 @@ async function main() {
 
         // Execute the Request
         const response = await llamaAPI.run({
-            "model": "llama3.1-8b",
+            "model": "meta-llama/Meta-Llama-3.1-8B-Instruct",
             "messages": messages,
             "stream": false,
         })
 
+        console.log(response.status);
         console.log(response.choices[0].message.content);
 
         userQuestion = await askQuestion("\nHow else can I help you? ");
