@@ -19,10 +19,10 @@ async function main() {
 
     //const template_filename = "template_prd.txt";
     //const document_filename = "document_mfg_defect_tracker.txt";
-    //const template_filename = "template_trip_report.txt";
-    //const document_filename = "document_trip_to_boston.txt";
-    const template_filename = "template_medical_process_improvement.txt";
-    const document_filename = "document_new_medicine_notes.txt";
+    const template_filename = "template_trip_report.txt";
+    const document_filename = "document_trip_to_boston.txt";
+    //const template_filename = "template_medical_process_improvement.txt";
+    //const document_filename = "document_new_medicine_notes.txt";
 
     var template = "";
     var document = "";
@@ -63,6 +63,7 @@ async function main() {
         messages: messages
     });
 
+    console.log(response)
     console.log(response.choices[0].message.content);
 
     // Log the first greeting
