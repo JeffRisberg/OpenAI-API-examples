@@ -8,7 +8,7 @@ Our factory builds advanced bicycles.
 
 cost control is an important issue, because some parts are quite expensive.
 
-The types of bikes are Virgina-class, Seawolf-class, and Columbia-class.
+The types of bikes are Virginia-class, Seawolf-class, and Columbia-class.
 
 The pieces of a bike are:
 * frame
