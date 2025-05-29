@@ -1,0 +1,94 @@
+{
+  "inventory": [
+    {
+      "part": "Frame",
+      "material": "aluminum",
+      "size": "54cm",
+      "color": "blue",
+      "quantity": 10
+    },
+    {
+      "part": "Wheel",
+      "type": "front",
+      "rim_material": "carbon",
+      "tire_size": "700x25c",
+      "spokes": 32,
+      "quantity": 5
+    },
+    {
+      "part": "Wheel",
+      "type": "rear",
+      "rim_material": "carbon",
+      "tire_size": "700x25c",
+      "spokes": 32,
+      "quantity": 5
+    },
+    {
+      "part": "Crankset",
+      "brand": "Shimano 105",
+      "quantity": 8
+    },
+    {
+      "part": "Cassette",
+      "size": "11-28T",
+      "quantity": 10
+    },
+    {
+      "part": "Chain",
+      "brand": "KMC X11",
+      "quantity": 15
+    },
+    {
+      "part": "Derailleur",
+      "position": "front",
+      "brand": "Shimano 105",
+      "quantity": 7
+    },
+    {
+      "part": "Derailleur",
+      "position": "rear",
+      "brand": "Shimano 105",
+      "quantity": 7
+    },
+    {
+      "part": "Brake",
+      "type": "disc",
+      "brand": "Shimano 105 hydraulic",
+      "position": "front",
+      "quantity": 6
+    },
+    {
+      "part": "Brake",
+      "type": "disc",
+      "brand": "Shimano 105 hydraulic",
+      "position": "rear",
+      "quantity": 6
+    },
+    {
+      "part": "Handlebar",
+      "type": "Drop bar",
+      "quantity": 12
+    },
+    {
+      "part": "Stem",
+      "length": "90mm",
+      "quantity": 10
+    },
+    {
+      "part": "Grip Tape",
+      "material": "Cork",
+      "quantity": 20
+    },
+    {
+      "part": "Saddle",
+      "brand": "Fizik",
+      "model": "Arione",
+      "quantity": 5
+    },
+    {
+      "part": "Seatpost",
+      "material": "Carbon",
+      "quantity": 8
+    }
+  ]
+}
