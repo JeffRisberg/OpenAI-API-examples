@@ -17,7 +17,8 @@ async function askQuestion(question) {
 
 async function main() {
 
-    const document_filename = "part_inventory_list.json";
+    //const document_filename = "part_inventory_list.json";
+    const document_filename = "problem_report_rows.json";
 
     var document = "";
 
